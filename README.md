@@ -1,65 +1,80 @@
 # PAGS–LSRD Robot Arm Topology Optimization
 
-**MATLAB research implementation accompanying a manuscript submitted to _Structural and Multidisciplinary Optimization_ (SMO).**
+MATLAB implementation of multi-objective reaction–diffusion level-set topology optimization for an orthotropic composite robotic arm, including the Paraxial Alignment Geometric Stability (PAGS) objective.
 
 **Manuscript:** _Level Set-Reaction Diffusion-Based Topology Optimization Method integrated with center of gravity stability via paraxial alignment for designing 3D-Printed Robot Arms_
 
-**Authors:** Le Thi Bich Nam, Dinh Phu Nguyen, Van Hanh Dang, TienDung Vu.
+**Authors:** Le Thi Bich Nam, Dinh Phu Nguyen, Van Hanh Dang, and TienDung Vu.
 
-## Scope
+**Journal:** Manuscript submitted to _Structural and Multidisciplinary Optimization_ (SMO). The repository does not imply acceptance or publication.
 
-The method combines an orthotropic Q4 finite-element formulation, a normalized compliance–PAGS (Paraxial Alignment Geometric Stability) objective, and reaction–diffusion level-set evolution. The software organization is inspired by PolyTop; it **does not** implement PolyTop's polygonal elements or OC optimizer.
+## Repository status and branches
 
-**Repository status: full MATLAB source uploaded for review; numerical verification pending.** The author-supplied `MAIN.m` and 13 supporting MATLAB functions in `FUNCTION_PAGS/` are present on this review branch. Numerical reproduction has **not been verified** by executing the refactored code against the original scripts. See [REPLICATION_GUIDE.md](REPLICATION_GUIDE.md) and [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
+- **Default branch:** `Nguyen-Dinh-Phu` — initial project landing page; the reviewed MATLAB source is **not yet merged** into this branch.
+- **Source review branch:** `review/matlab-source-and-replication` — contains `MAIN.m`, all 13 functions in `FUNCTION_PAGS/`, and the supporting documentation.
+- **Validation:** Source files are available for inspection, but numerical equivalence to the original research runs has **not yet been confirmed by running MATLAB**.
 
-## Source structure
+**Note:** This repository is public, so files in the review branch are publicly accessible even before a merge into the default branch.
+
+## Repository structure
 
 ```text
-MAIN.m                         Entry point: FEM, parameters, studies
-PAGS_Study.m                   Run convergence and parametric cases
-PAGS_LSRD.m                    Solve one PAGS-LSRD optimization case
-PAGS_Output.m                  Display manuscript plots (no file export)
+MAIN.m
+README.md
+REPLICATION_GUIDE.md
+REVIEW_CHECKLIST.md
+.gitignore
 FUNCTION_PAGS/
-  Domain.m                     Structured Q4 mesh
-  ApplyBC.m                    Supports, loading, non-design regions
-  GetMeshInfo.m                Element centroids and areas
-  InitializeSystem.m           Orthotropic FEM and LS-RD operators
-  AnalyzeFEM_PAGS_FixedTheta.m Objective, FEM solution, sensitivities
-  Calculate_RC0.m              Reference reaction-center estimate
-  ElementToNodalSensitivity.m  Element-to-node sensitivity projection
-  LVS.m                        Level-set reaction-diffusion step
-  PhiToDensity.m               Regularized density mapping
-  ApplyPassivePhi.m            Passive-region level-set values
+    Domain.m
+    ApplyBC.m
+    ApplyPassivePhi.m
+    GetMeshInfo.m
+    InitializeSystem.m
+    AnalyzeFEM_PAGS_FixedTheta.m
+    Calculate_RC0.m
+    ElementToNodalSensitivity.m
+    PhiToDensity.m
+    LVS.m
+    PAGS_LSRD.m
+    PAGS_Study.m
+    PAGS_Output.m
 ```
 
-## Run (once all MATLAB files are present)
+`MAIN.m` specifies the problem and studies; `PAGS_Study.m` coordinates runs; `PAGS_LSRD.m` performs the optimization; and `PAGS_Output.m` displays the computational figures. The FEM and level-set helper functions reside in `FUNCTION_PAGS/`.
 
-1. Open the repository folder in MATLAB, then run `MAIN`.
-2. Choose `study.runMode = 'history'`, `'sweep'`, or `'all'` inside `MAIN.m`.
-3. The display-only `PAGS_Output.m` opens the figures in MATLAB and **does not export PNG or CSV**.
-4. The uploaded `MAIN.m` uses `Domain(120,30,360,90)`, the **360 × 90 element** manuscript-resolution mesh. A **120 × 30 element** mesh may be substituted for local smoke testing, but cannot support quantitative manuscript replication.
+## Getting started
 
-**Loading convention:** for boundary case `'3'`, `ApplyBC(...,'3',5000)` means the resultant vertical load is **−5000 N** (`Fx=0`).
+Download or clone **the source review branch**, then run `MAIN.m` from MATLAB:
 
-## Numerical studies
+```bash
+git clone --branch review/matlab-source-and-replication --single-branch https://github.com/Nguyen-Dinh-Phu/PAGS-LSRD-Robot-Arm-Topology-Optimization.git
+```
 
-| Study mode | Cases | Parameters | Intended manuscript outputs |
+```matlab
+cd('path/to/PAGS-LSRD-Robot-Arm-Topology-Optimization')
+MAIN
+```
+
+The driver adds both the root folder and `FUNCTION_PAGS/` to the MATLAB path and defaults to `study.runMode = 'all'`. Set `'history'` or `'sweep'` to run only one study.
+
+**Default model:** `Domain(120,30,360,90)` defines a 120 × 30 domain with 360 × 90 Q4 elements. `ApplyBC(...,'3',5000)` applies a **total vertical load of −5000 N** at the robotic-arm joint, with `Fx=0`. Other key settings include `Vmaxin=0.60` and `Inter=400` iterations.
+
+## Numerical studies and displayed outputs
+
+| Mode | Cases | Parameters | MATLAB figures |
 | --- | --- | --- | --- |
-| `history` | Reference plus four orientation cases | `theta=[0,30,45,60]`, `w=0.4` plus baseline `w=0`, `alpha=1`, `delta=0.6` | Figs. 3–6 |
-| `sweep` | 24 orientation–weight combinations | `theta=[0,30,45,60]`, `w=[0,0.1,0.2,0.3,0.4,0.5]`, `alpha=0.6`, `delta=1` | Table 3, Fig. 7 |
-| `all` | Both studies | All settings above | All computational figures |
+| `history` | Compliance-only baseline and four orientation cases | `theta=[0,30,45,60]` degrees, `w=0.4` for the four cases; baseline `w=0`; `alpha=1`, `delta=0.6` | Fig. 3, Fig. 4, Fig. 5a–b, Fig. 6a–b |
+| `sweep` | 24 orientation–weight combinations | `theta=[0,30,45,60]`; `w=[0,0.1,0.2,0.3,0.4,0.5]`; `alpha=0.6`, `delta=1` | Table 3 topology matrix, Fig. 7a–c |
+| `all` | Both sets of runs | Both configurations | All 10 figure windows |
 
-The physical specimen photograph is not generated by the MATLAB code.
+For the convergence and trade-off plots, the 60° case uses a **red `x` marker**. The experimental photograph is not generated by this MATLAB code.
 
-## Scientific and software notes
+**Output behavior:** `PAGS_Output.m` displays figures but does **not** export PNG, CSV, or MAT files. `PAGS_Study.m` nevertheless creates the `Results/` folder if absent and prints an output-directory message. Results computed in `MAIN.m` remain in the workspace variable `studyResults` unless the MATLAB session is closed or the data are explicitly saved.
 
-- `PAGS_Study` preserves the reference-penalization carry-over in the historical orientation study, while the sweep resets the reference exponent for each case.
-- Curves for 60° use a **red `x` marker**, as in the final plotting convention.
-- No automated numerical regression, standalone FEM patch test, or manuscript-data verification has been reported yet.
-- Source code and redistribution terms remain under author review; no third-party PolyTop code is included.
+## Replication and limitations
 
-## Reference for software organization
+See [REPLICATION_GUIDE.md](REPLICATION_GUIDE.md) for model settings and a validation protocol, and [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md) for outstanding tests.
 
-Talischi, C., Paulino, G. H., Pereira, A., and Menezes, I. F. (2012). “PolyTop: a MATLAB implementation of a general topology optimization framework using unstructured polygonal finite element meshes.” _Structural and Multidisciplinary Optimization_, 45, 329–357. https://doi.org/10.1007/s00158-011-0696-x
+The source contains a reference-penalization carry-over in the convergence study; in the parametric sweep each case starts with reference exponent 1. The Q4 element DOF ordering, manuscript parameter consistency, and quantitative reproduction of all reported results still require verification.
 
-**Citation of this research:** use the manuscript's final bibliographic reference after acceptance/publication. This README does not imply that the manuscript has been accepted.
+**How to cite:** Cite the manuscript once its final publication details are available. No software license has been selected in this review branch.
