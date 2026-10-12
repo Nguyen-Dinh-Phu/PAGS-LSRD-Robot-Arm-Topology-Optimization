@@ -21,7 +21,7 @@ The intended iterations per case are `opt.Inter=400`; target volume fraction `op
 
 ## Fidelity and plotting
 
-**Mesh:** `Domain(120,30,120,30)` in the short driver is a smoke-test mesh, not the published `360×90` discretization. For manuscript-resolution results, use `Domain(120,30,360,90)` and retain the published boundary case and physical parameters.
+**Mesh:** The supplied `MAIN.m` already uses `Domain(120,30,360,90)`, the manuscript-resolution `360×90` discretization. A `120×30` element mesh may be used for quick tests only.
 
 **Load:** `ApplyBC(...,'3',5000)` is a total resultant `Fy=-5000 N` in the current case-3 code. Earlier input conventions used a different nominal force multiplier: do not mix these.
 
