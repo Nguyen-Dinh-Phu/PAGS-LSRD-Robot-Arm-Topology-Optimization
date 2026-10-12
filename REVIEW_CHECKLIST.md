@@ -1,6 +1,6 @@
 # Pre-publication review checklist
 
-- [ ] Upload the authors' **final** `MAIN.m`, `PAGS_Study.m`, `PAGS_LSRD.m`, `PAGS_Output.m`, and the full `FUNCTION_PAGS` directory.
+- [x] Upload the supplied `MAIN.m`, `PAGS_Study.m`, `PAGS_LSRD.m`, `PAGS_Output.m`, and the 13-file `FUNCTION_PAGS` directory to the review branch.
 - [ ] Check function names, filenames and `addpath` for case-sensitive platforms.
 - [ ] Validate the Q4 local node / DOF ordering and element index mapping.
 - [ ] Confirm the applied resultant load is −5000 N for the manuscript robot-arm case.
