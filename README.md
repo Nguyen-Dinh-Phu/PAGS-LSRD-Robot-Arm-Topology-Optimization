@@ -10,7 +10,7 @@
 
 The method combines an orthotropic Q4 finite-element formulation, a normalized compliance–PAGS (Paraxial Alignment Geometric Stability) objective, and reaction–diffusion level-set evolution. The software organization is inspired by PolyTop; it **does not** implement PolyTop's polygonal elements or OC optimizer.
 
-**Repository status: preparation for source-code publication.** The reviewed MATLAB source files have not yet been uploaded to this branch. Numerical reproduction has **not been verified** by executing the refactored code against the original scripts. See [REPLICATION_GUIDE.md](REPLICATION_GUIDE.md) and [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
+**Repository status: preparation for source-code publication; supporting MATLAB functions not yet uploaded.** The MATLAB entry point `MAIN.m` has been uploaded. The 13 supporting functions in `FUNCTION_PAGS/` are pending transfer from the author's final ZIP package. Numerical reproduction has **not been verified** by executing the refactored code against the original scripts. See [REPLICATION_GUIDE.md](REPLICATION_GUIDE.md) and [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 
 ## Intended structure
 
@@ -37,7 +37,7 @@ FUNCTION_PAGS/
 1. Open the repository folder in MATLAB, then run `MAIN`.
 2. Choose `study.runMode = 'history'`, `'sweep'`, or `'all'` inside `MAIN.m`.
 3. The display-only `PAGS_Output.m` opens the figures in MATLAB and **does not export PNG or CSV**.
-4. The shared driver presently uses a **120 × 30 element** quick-run mesh. Set `Domain(120,30,360,90)` for the **360 × 90 element** manuscript-resolution case; do not claim quantitative replication from the coarse mesh.
+4. The uploaded `MAIN.m` uses `Domain(120,30,360,90)`, the **360 × 90 element** manuscript-resolution mesh. A **120 × 30 element** mesh may be substituted for local smoke testing, but cannot support quantitative manuscript replication.
 
 **Loading convention:** for boundary case `'3'`, `ApplyBC(...,'3',5000)` means the resultant vertical load is **−5000 N** (`Fx=0`).
 
