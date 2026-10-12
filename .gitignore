@@ -1,0 +1,25 @@
+# MATLAB generated files
+*.asv
+*.autosave
+*.mex*
+*.p
+*.m~
+*.slxc
+*.slprj/
+*.prj
+*.fig
+*.mat
+*.log
+*.diary
+
+# Computational exports
+Published_Results/
+results/
+output/
+
+# Temporary and operating-system files
+.DS_Store
+Thumbs.db
+~$*
+*.swp
+*.tmp
