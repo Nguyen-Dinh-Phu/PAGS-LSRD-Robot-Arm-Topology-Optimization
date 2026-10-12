@@ -1,42 +1,50 @@
 # Replication guide
 
-## Prerequisites
+This guide documents the MATLAB source on branch `review/matlab-source-and-replication`. It is not a claim of independently validated numerical replication.
 
-MATLAB version supporting `tiledlayout`, `MarkerIndices`, and the plotting functions used in `PAGS_Output.m`. No MATLAB execution or full numerical benchmark has yet been performed on the refactored source.
+## Prerequisites and branch
 
-## Execution
+Use a MATLAB release supporting `tiledlayout`, `yyaxis`, and `MarkerIndices`. Download the **review branch** (the default branch `Nguyen-Dinh-Phu` may not contain the MATLAB functions):
+
+```bash
+git clone --branch review/matlab-source-and-replication --single-branch https://github.com/Nguyen-Dinh-Phu/PAGS-LSRD-Robot-Arm-Topology-Optimization.git
+```
+
+Run from MATLAB:
 
 ```matlab
 cd('path/to/PAGS-LSRD-Robot-Arm-Topology-Optimization')
 MAIN
 ```
 
-The entry point adds the project root and `FUNCTION_PAGS` to the MATLAB path. Select the study with `study.runMode`:
+`MAIN.m` adds `FUNCTION_PAGS/` to the MATLAB search path.
 
-- `history`: reference (`w=0`) and `w=0.4` at 0°, 30°, 45°, 60°; `alpha=1.0`, `delta=0.6`.
-- `sweep`: 24 combinations of `w=0:0.1:0.5` and `theta=[0,30,45,60]`; `alpha=0.6`, `delta=1.0`.
-- `all`: both studies.
+## Numerical settings
 
-The intended iterations per case are `opt.Inter=400`; target volume fraction `opt.Vmaxin=0.60`; continuation length `opt.nvol=200`.
+- **Domain:** 120 × 30; **mesh:** 360 × 90 Q4 elements (`Domain(120,30,360,90)`).
+- **Loads and supports:** robotic-arm boundary case `'3'`; `ApplyBC(...,'3',5000)` specifies `Fx=0` and total `Fy=-5000 N`. The current routine fixes the left joint's selected inner-rim nodes.
+- **Material:** `E11=73.2e9 Pa`, `E22=4.1e9 Pa`, `G12=2.2e9 Pa`, `nu12=0.33`. `Emin=1e-4` is a dimensionless residual stiffness factor.
+- **Optimization:** `Vmaxin=0.60`, `Inter=400`, `nvol=200`, `dt=0.1`, `tau=1`, `betaVol=25`, `dVol=-0.001`.
+- **History:** baseline `w=0, theta=0°`; four `w=0.4` cases at `theta=[0,30,45,60]°`, with `alpha=1` and `delta=0.6`.
+- **Sweep:** 24 combinations of `theta=[0,30,45,60]°` and `w=[0,0.1,0.2,0.3,0.4,0.5]`; `alpha=0.6`, `delta=1`.
 
-## Fidelity and plotting
+Use `study.runMode='history'`, `'sweep'`, or `'all'` to control execution; the uploaded driver defaults to `'all'`.
 
-**Mesh:** The supplied `MAIN.m` already uses `Domain(120,30,360,90)`, the manuscript-resolution `360×90` discretization. A `120×30` element mesh may be used for quick tests only.
+## Results and display behavior
 
-**Load:** `ApplyBC(...,'3',5000)` is a total resultant `Fy=-5000 N` in the current case-3 code. Earlier input conventions used a different nominal force multiplier: do not mix these.
+The code is configured to open the Fig. 3–7 computational plots and the Table 3 topology matrix directly in MATLAB, a total of 10 figure windows when both studies run. No PNG, CSV, or MAT files are written by `PAGS_Output.m`. However, `PAGS_Study.m` **does create an empty `Results/` directory** if missing and prints a message naming that directory. The `studyResults` workspace variable contains the computed result structures.
 
-**Display:** `PAGS_Output` displays figures; it does not save PNG, CSV, or MAT files. To archive scientific numerical outputs, separately store approved result data and explain any changes in the manuscript/repository.
+History arrays record responses evaluated **before** each level-set update, while `Cfinal` and `d2final` refer to the state **after** the final update. The convergence study passes the preceding case's final penalization exponent into the next case's reference-state calculation. The sweep uses `referencePenal=1.0` for each case.
 
-**Sampling:** Iteration histories represent states evaluated **before** each update, while final metrics are evaluated **after** the last update. Expect a possible small difference at iteration 400.
+`Calculate_RC0` estimates the reference center; its fallback for non-clamped supports uses a magnitude-weighted reaction centroid rather than the moment-equivalent resultant location. Its computed reference point must be interpreted accordingly.
 
-**Interpretation:** `Calculate_RC0` supplies the reference center used for CG–RC comparisons; its branch for non-clamped supports uses a reaction-magnitude-weighted location, not a force/moment-equivalent line of action.
+## Verification before publication
 
-## Verification required before claiming reproduction
+1. Test the orthotropic Q4 element on known displacement/patch cases and check the local stiffness-node ordering against `SYS.edofMat`.
+2. Verify consistent element numbering across mesh connectivity, element centroids, passive sets, and density fields.
+3. Check force resultant, support DOFs, and selected passive regions numerically.
+4. Reconcile the manuscript's published `G12`, `Emin`, material units, loads, and element count with the actual source.
+5. Run the full history and 24-case sweep at 360 × 90, compare compliance, CG–RC squared distance, final topology, and reported figures/table to the original research outputs.
+6. Document the MATLAB release, compute environment, tested commit SHA, and numerical tolerances.
 
-1. Check Q4 displacement DOF connectivity versus the local `coord` ordering used to integrate `SYS.KE`. The original assembly may have inconsistent node ordering and should not be silently changed.
-2. Confirm `mesh.info.Centroid`, the passive sets and `SYS.edofMat` share one element enumeration.
-3. Verify resultant force, fixed DOFs, and passive element maps for boundary case 3.
-4. Compare baseline compliance, volume history, all four angles, and 24-case sweep results against the original MATLAB scripts and manuscript tables at the **same mesh**.
-5. Record MATLAB version, compute environment and tested commit SHA.
-
-Until these checks have passed, the repository should be described as a **research implementation under numerical verification**, not as independently validated exact replication.
+These steps have **not yet been completed or verified** through execution of the uploaded code.
