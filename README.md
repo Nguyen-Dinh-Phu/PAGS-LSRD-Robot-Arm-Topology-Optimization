@@ -10,9 +10,9 @@
 
 The method combines an orthotropic Q4 finite-element formulation, a normalized compliance–PAGS (Paraxial Alignment Geometric Stability) objective, and reaction–diffusion level-set evolution. The software organization is inspired by PolyTop; it **does not** implement PolyTop's polygonal elements or OC optimizer.
 
-**Repository status: preparation for source-code publication; supporting MATLAB functions not yet uploaded.** The MATLAB entry point `MAIN.m` has been uploaded. The 13 supporting functions in `FUNCTION_PAGS/` are pending transfer from the author's final ZIP package. Numerical reproduction has **not been verified** by executing the refactored code against the original scripts. See [REPLICATION_GUIDE.md](REPLICATION_GUIDE.md) and [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
+**Repository status: full MATLAB source uploaded for review; numerical verification pending.** The author-supplied `MAIN.m` and 13 supporting MATLAB functions in `FUNCTION_PAGS/` are present on this review branch. Numerical reproduction has **not been verified** by executing the refactored code against the original scripts. See [REPLICATION_GUIDE.md](REPLICATION_GUIDE.md) and [REVIEW_CHECKLIST.md](REVIEW_CHECKLIST.md).
 
-## Intended structure
+## Source structure
 
 ```text
 MAIN.m                         Entry point: FEM, parameters, studies
